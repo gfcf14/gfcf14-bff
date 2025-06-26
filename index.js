@@ -1,10 +1,27 @@
 require('dotenv').config();
-const express = require('express');
 const { connectToDb, pool } = require('./configs/db.config');
+const webDevToonsPostController = require('./controllers/webdevtoons/post.controller');
+const cors = require('cors');
+const express = require('express');
+
+const allowedOrigins = process.env.FRONT_END_ORIGINS?.split(',') || [];
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow no-origin (like mobile apps or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+};
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
+app.use('/api/webdevtoons', webDevToonsPostController);
 
 app.get('/', (req, res) => {
   res.send('GFCF14 BFF is live');
@@ -17,15 +34,5 @@ async function startServer() {
   );
   connectToDb();
 }
-
-app.get('/api/webdevtoons/posts', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM posts ORDER BY date DESC');
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Failed to fetch posts');
-  }
-});
 
 startServer();
