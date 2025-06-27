@@ -16,7 +16,12 @@ router.get('/posts', async (req, res) => {
 router.get('/posts/:date', async (req, res) => {
   const { date } = req.params;
   try {
-    const post = await postService.getPost(date);
+    let post = await postService.findClosestPostOnOrBefore(date);
+
+    if (!post) {
+      post = await postService.findEarliestPost();
+    }
+
     if (post) {
       res.json(post);
     } else {

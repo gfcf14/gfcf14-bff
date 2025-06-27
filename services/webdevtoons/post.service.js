@@ -34,6 +34,45 @@ async function getPost(date) {
   return result.rows[0];
 }
 
+
+
+async function findClosestPostOnOrBefore(date) {
+  const query = `
+    SELECT
+      p.date,
+      p.title,
+      p.description,
+      p.image,
+      COALESCE(json_agg(json_build_object('type', l.type, 'url', l.url)) FILTER (WHERE l.type IS NOT NULL), '[]') AS links
+    FROM posts p
+    LEFT JOIN post_links l ON p.date = l.post_date
+    WHERE p.date <= $1
+    GROUP BY p.date, p.title, p.description, p.image
+    ORDER BY p.date DESC
+    LIMIT 1;
+  `;
+  const result = await pool.query(query, [date]);
+  return result.rows[0] || null;
+}
+
+async function findEarliestPost() {
+  const query = `
+    SELECT
+      p.date,
+      p.title,
+      p.description,
+      p.image,
+      COALESCE(json_agg(json_build_object('type', l.type, 'url', l.url)) FILTER (WHERE l.type IS NOT NULL), '[]') AS links
+    FROM posts p
+    LEFT JOIN post_links l ON p.date = l.post_date
+    GROUP BY p.date, p.title, p.description, p.image
+    ORDER BY p.date ASC
+    LIMIT 1;
+  `;
+  const result = await pool.query(query);
+  return result.rows[0] || null;
+}
+
 async function createPost(post) {
   const { date, title, description, image, links } = post;
 
@@ -63,5 +102,7 @@ async function createPost(post) {
 module.exports = {
   createPost,
   getPost,
-  getAllPosts
+  getAllPosts,
+  findClosestPostOnOrBefore,
+  findEarliestPost
 };
