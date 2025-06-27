@@ -1,5 +1,6 @@
 require('dotenv').config();
-const { connectToDb, pool } = require('./configs/db.config');
+const { connectToDb } = require('./configs/db.config');
+const authController = require('./controllers/auth/auth.controller');
 const webDevToonsPostController = require('./controllers/webdevtoons/post.controller');
 const cors = require('cors');
 const express = require('express');
@@ -19,9 +20,11 @@ const corsOptions = {
 
 const app = express();
 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use('/api/webdevtoons', webDevToonsPostController);
+app.use('/api/login', authController);
 
 app.get('/', (req, res) => {
   res.send('GFCF14 BFF is live');
