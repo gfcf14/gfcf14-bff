@@ -94,9 +94,9 @@ async function createPost(post) {
     await pool.query(insertLinksQuery, [date, ...linkValues]);
   }
 
-  res.status(201).json({
-    message: `Post "${createdPost.title}" successfully created`
-  });
+  return {
+    message: `Post "${title}" successfully created`
+  };
 };
 
 module.exports = {
