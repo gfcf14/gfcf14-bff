@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const postService = require('../../services/webdevtoons/post.service');
 const { isTokenValid, canPost } = require('../../utils/jwt.util');
+const postSchema = require('../../schemas/post.schema');
 
 router.get('/posts', async (req, res) => {
   try {
@@ -34,6 +35,12 @@ router.get('/posts/:date', async (req, res) => {
 });
 
 router.post('/posts', async (req, res) => {
+  const { error } = postSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
