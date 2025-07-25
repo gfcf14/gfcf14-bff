@@ -2,6 +2,7 @@ require('dotenv').config();
 const { connectToDb } = require('./configs/db.config');
 const authController = require('./controllers/auth/auth.controller');
 const webDevToonsPostController = require('./controllers/webdevtoons/post.controller');
+const gfcf14ArtArtworkController = require('./controllers/gfcf14-art/artwork.controller');
 const cors = require('cors');
 const express = require('express');
 
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use('/api/webdevtoons', webDevToonsPostController);
+app.use('/api/gfcf14-art', gfcf14ArtArtworkController);
 app.use('/api/login', authController);
 
 app.get('/', (req, res) => {
