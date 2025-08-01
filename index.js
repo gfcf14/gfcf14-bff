@@ -29,7 +29,7 @@ app.use('/api/gfcf14-art', gfcf14ArtArtworkController);
 app.use('/api/login', authController);
 
 app.get('/', (req, res) => {
-  res.send('GFCF14 BFF is live');
+  res.send('GFCF14 Shared Backend App is live');
 });
 
 async function startServer() {
